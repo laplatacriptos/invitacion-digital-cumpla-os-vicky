@@ -194,8 +194,8 @@ h1 {
   margin-top: 8px;
   padding: 10px;
   border-radius: 10px;
-  background: var(--sheet-glass);
-  border: 1px solid rgba(169, 129, 57, 0.55);
+  background: transparent;
+  /*border: 1px solid rgba(169, 129, 57, 0.55);*/
   backdrop-filter: blur(4px);
   scrollbar-width: thin;
   scrollbar-color: rgba(169, 129, 57, 0.65) transparent;
