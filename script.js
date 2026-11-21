@@ -20,7 +20,9 @@ let eventConfig = {
     "Golosinas"
   ],
   giftAlias: "latorrevic",
-  giftAliasNote: "Pero si no te decidiste que regalarme te dejo mi alias: latorrevic"
+  giftAliasNote: "Pero si no te decidiste que regalarme te dejo mi alias: latorrevic",
+  whatsappPhone: "5491128488571",
+  whatsappMessage: "Hola Vicky confirmo mi asistencia a tu cumple, gracias por la invitación! 💖✨"
 };
 
 let countdownInterval = null;
@@ -48,6 +50,12 @@ function buildGoogleCalendarUrl() {
   const location = encodeURIComponent(eventConfig.address);
   const details = encodeURIComponent(eventConfig.phrase);
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${details}&location=${location}`;
+}
+
+function buildWhatsAppUrl() {
+  const cleanPhone = String(eventConfig.whatsappPhone || "5491128488571").replace(/\D/g, "");
+  const message = eventConfig.whatsappMessage || "Hola Vicky confirmo mi asistencia a tu cumple, gracias por la invitación! 💖✨";
+  return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
 }
 
 function renderGiftSuggestions() {
@@ -128,6 +136,7 @@ function renderEventData() {
   document.getElementById("event-address-text").textContent = eventConfig.address;
   document.getElementById("maps-link").href = eventConfig.mapsUrl;
   document.getElementById("calendar-link").href = buildGoogleCalendarUrl();
+  document.getElementById("btn-whatsapp").href = buildWhatsAppUrl();
   renderGiftSuggestions();
 }
 

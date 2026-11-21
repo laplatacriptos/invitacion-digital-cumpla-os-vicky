@@ -269,8 +269,16 @@ h1 {
   border-top: 1px solid rgba(169, 129, 57, 0.35);
   font-size: 0.75rem;
   line-height: 1.35;
-  color: var(--ink-black);
+  color: white;
   font-weight: 500;
+    border-radius: 9px;
+  border: 1.5px solid var(--champagne-dark);
+  background: linear-gradient(135deg, rgba(246, 229, 190, 0.95), rgba(212, 175, 106, 0.95));
+  color: var(--ink-black);
+
+  padding: 8px 12px;
+
+
 }
 
 .gift-alias-note strong {
@@ -332,4 +340,18 @@ h1 {
 .time-box small {
   font-size: 0.65rem;
   color: var(--ink-soft);
+}
+.champagne-btn.whatsapp-btn {
+  background: linear-gradient(135deg, #252022, #161314);
+  color: var(--champagne-light);
+  border-color: var(--champagne);
+}
+
+.champagne-btn.whatsapp-btn:hover {
+  background: linear-gradient(135deg, #322b2e, #1d191b);
+  box-shadow: 0 5px 15px rgba(22, 19, 20, 0.26);
+}
+
+.whatsapp-btn .wa-icon {
+  color: #4ade80;
 }
