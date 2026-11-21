@@ -24,8 +24,9 @@ let eventConfig = {
 };
 
 let countdownInterval = null;
-let overlayShown = false;
+let overlayCompleted = false;
 let copyResetTimeout = null;
+let revealRafId = null;
 
 async function loadConfig() {
   try {
@@ -130,13 +131,42 @@ function renderEventData() {
   renderGiftSuggestions();
 }
 
+function setRevealProgress(progress) {
+  const clamped = Math.max(0, Math.min(1, progress));
+  const overlay = document.getElementById("sheet-overlay");
+  if (!overlay) return;
+
+  overlay.style.setProperty("--reveal-progress", clamped.toFixed(4));
+  if (clamped >= 0.65) {
+    overlay.classList.add("interactive");
+  }
+}
+
+function syncRevealWithVideo() {
+  const video = document.getElementById("bg-video");
+  if (!video || overlayCompleted) return;
+
+  if (video.duration && Number.isFinite(video.duration)) {
+    const openStart = video.duration * 0.42;
+    const openEnd = video.duration * 0.92;
+    const rawProgress = (video.currentTime - openStart) / (openEnd - openStart);
+    setRevealProgress(rawProgress);
+  }
+
+  revealRafId = requestAnimationFrame(syncRevealWithVideo);
+}
+
 function revealSheetControls() {
-  if (overlayShown) return;
-  overlayShown = true;
+  overlayCompleted = true;
+  if (revealRafId) {
+    cancelAnimationFrame(revealRafId);
+  }
 
   const video = document.getElementById("bg-video");
   const skipBtn = document.getElementById("btn-skip");
   const overlay = document.getElementById("sheet-overlay");
+
+  setRevealProgress(1);
 
   if (video && video.duration) {
     video.pause();
@@ -147,7 +177,7 @@ function revealSheetControls() {
     skipBtn.classList.add("hidden");
   }
   if (overlay) {
-    overlay.classList.add("visible");
+    overlay.classList.add("interactive");
   }
 }
 
@@ -160,6 +190,7 @@ function showPanel(panelId, buttonEl) {
   buttons.forEach((b) => b.classList.remove("active-btn"));
 
   infoPanel.classList.remove("hidden");
+  infoPanel.scrollTop = 0;
   document.getElementById(panelId).classList.remove("hidden");
   buttonEl.classList.add("active-btn");
 
@@ -194,18 +225,26 @@ function startCountdown() {
 
 document.addEventListener("DOMContentLoaded", () => {
   loadConfig();
+  setRevealProgress(0);
 
   const video = document.getElementById("bg-video");
   const skipBtn = document.getElementById("btn-skip");
   const copyAliasBtn = document.getElementById("btn-copy-alias");
 
   if (video) {
+    video.addEventListener("play", () => {
+      if (!overlayCompleted) {
+        if (revealRafId) cancelAnimationFrame(revealRafId);
+        revealRafId = requestAnimationFrame(syncRevealWithVideo);
+      }
+    });
     video.addEventListener("ended", revealSheetControls);
     video.addEventListener("timeupdate", () => {
       if (video.duration && video.currentTime >= video.duration - 0.15) {
         revealSheetControls();
       }
     });
+    revealRafId = requestAnimationFrame(syncRevealWithVideo);
   }
 
   if (skipBtn) {
