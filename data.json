@@ -5,5 +5,20 @@
   "timeLabel": "A partir de las 21:00 hs",
   "address": "Deán Funes 399-499, Benavídez, Provincia de Buenos Aires",
   "targetIso": "2026-12-19T21:00:00-03:00",
-  "mapsUrl": "https://www.google.com/maps/search/?api=1&query=De%C3%A1n+Funes+399-499,+Benav%C3%ADdez,+Provincia+de+Buenos+Aires"
+  "mapsUrl": "https://www.google.com/maps/search/?api=1&query=De%C3%A1n+Funes+399-499,+Benav%C3%ADdez,+Provincia+de+Buenos+Aires",
+  "giftSuggestions": [
+    "Buzos",
+    "Perfumes dulces",
+    "Accesorios plateados",
+    "Peluches",
+    "Maquillaje",
+    "Vasos",
+    "Llaveros",
+    "Flores",
+    "Cartas",
+    "Cosas para el pelo",
+    "Golosinas"
+  ],
+  "giftAlias": "latorrevic",
+  "giftAliasNote": "Pero si no te decidiste que regalarme te dejo mi alias: latorrevic"
 }

@@ -5,11 +5,27 @@ let eventConfig = {
   timeLabel: "A partir de las 21:00 hs",
   address: "Deán Funes 399-499, Benavídez, Provincia de Buenos Aires",
   targetIso: "2026-12-19T21:00:00-03:00",
-  mapsUrl: "https://www.google.com/maps/search/?api=1&query=De%C3%A1n+Funes+399-499,+Benav%C3%ADdez,+Provincia+de+Buenos+Aires"
+  mapsUrl: "https://www.google.com/maps/search/?api=1&query=De%C3%A1n+Funes+399-499,+Benav%C3%ADdez,+Provincia+de+Buenos+Aires",
+  giftSuggestions: [
+    "Buzos",
+    "Perfumes dulces",
+    "Accesorios plateados",
+    "Peluches",
+    "Maquillaje",
+    "Vasos",
+    "Llaveros",
+    "Flores",
+    "Cartas",
+    "Cosas para el pelo",
+    "Golosinas"
+  ],
+  giftAlias: "latorrevic",
+  giftAliasNote: "Pero si no te decidiste que regalarme te dejo mi alias: latorrevic"
 };
 
 let countdownInterval = null;
 let overlayShown = false;
+let copyResetTimeout = null;
 
 async function loadConfig() {
   try {
@@ -19,7 +35,7 @@ async function loadConfig() {
       eventConfig = { ...eventConfig, ...jsonData };
     }
   } catch (err) {
-    // Mantiene los valores por defecto si no carga data.json (por ejemplo, abriendo con file://)
+    // Mantiene los valores por defecto si no carga data.json
   }
   renderEventData();
 }
@@ -33,6 +49,76 @@ function buildGoogleCalendarUrl() {
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${details}&location=${location}`;
 }
 
+function renderGiftSuggestions() {
+  const giftsList = document.getElementById("gifts-list");
+  const aliasNoteEl = document.getElementById("gift-alias-note");
+
+  if (giftsList) {
+    giftsList.innerHTML = "";
+    const items = Array.isArray(eventConfig.giftSuggestions) ? eventConfig.giftSuggestions : [];
+
+    items.forEach((gift) => {
+      const li = document.createElement("li");
+      li.textContent = gift;
+      giftsList.appendChild(li);
+    });
+  }
+
+  if (aliasNoteEl) {
+    const rawNote = eventConfig.giftAliasNote || "";
+    const prefix = "Pero si no te decidiste que regalarme te dejo mi alias: ";
+    aliasNoteEl.textContent = "";
+
+    if (rawNote.startsWith(prefix)) {
+      const aliasValue = rawNote.slice(prefix.length).trim();
+      aliasNoteEl.appendChild(document.createTextNode(prefix));
+      const strong = document.createElement("strong");
+      strong.textContent = aliasValue;
+      aliasNoteEl.appendChild(strong);
+    } else {
+      aliasNoteEl.textContent = rawNote;
+    }
+  }
+}
+
+async function copyAliasToClipboard() {
+  const alias = eventConfig.giftAlias || "latorrevic";
+  const copyBtn = document.getElementById("btn-copy-alias");
+  const copyLabel = document.getElementById("copy-alias-label");
+
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(alias);
+    } else {
+      const tempInput = document.createElement("textarea");
+      tempInput.value = alias;
+      tempInput.style.position = "fixed";
+      tempInput.style.opacity = "0";
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempInput);
+    }
+
+    if (copyBtn && copyLabel) {
+      copyBtn.classList.add("copied");
+      copyLabel.textContent = "Alias copiado ✓";
+
+      if (copyResetTimeout) {
+        clearTimeout(copyResetTimeout);
+      }
+      copyResetTimeout = setTimeout(() => {
+        copyBtn.classList.remove("copied");
+        copyLabel.textContent = "Copiar alias";
+      }, 2200);
+    }
+  } catch (err) {
+    if (copyLabel) {
+      copyLabel.textContent = `Alias: ${alias}`;
+    }
+  }
+}
+
 function renderEventData() {
   document.getElementById("quinceanera-name").textContent = eventConfig.name;
   document.getElementById("invitation-phrase").textContent = `“${eventConfig.phrase}”`;
@@ -41,6 +127,7 @@ function renderEventData() {
   document.getElementById("event-address-text").textContent = eventConfig.address;
   document.getElementById("maps-link").href = eventConfig.mapsUrl;
   document.getElementById("calendar-link").href = buildGoogleCalendarUrl();
+  renderGiftSuggestions();
 }
 
 function revealSheetControls() {
@@ -110,6 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const video = document.getElementById("bg-video");
   const skipBtn = document.getElementById("btn-skip");
+  const copyAliasBtn = document.getElementById("btn-copy-alias");
 
   if (video) {
     video.addEventListener("ended", revealSheetControls);
@@ -124,6 +212,10 @@ document.addEventListener("DOMContentLoaded", () => {
     skipBtn.addEventListener("click", revealSheetControls);
   }
 
+  if (copyAliasBtn) {
+    copyAliasBtn.addEventListener("click", copyAliasToClipboard);
+  }
+
   document.getElementById("btn-fecha").addEventListener("click", function () {
     showPanel("panel-fecha", this);
   });
@@ -134,5 +226,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("btn-contador").addEventListener("click", function () {
     showPanel("panel-contador", this);
+  });
+
+  document.getElementById("btn-regalos").addEventListener("click", function () {
+    showPanel("panel-regalos", this);
   });
 });

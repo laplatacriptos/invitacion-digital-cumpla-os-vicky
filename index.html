@@ -42,13 +42,40 @@
 
       <nav class="action-buttons" aria-label="Opciones de la invitación">
         <button id="btn-fecha" class="champagne-btn" type="button">
-          Fecha del evento
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="18" rx="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+          </svg>
+          <span>Fecha del evento</span>
         </button>
+
         <button id="btn-lugar" class="champagne-btn" type="button">
-          Lugar de encuentro
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z" />
+            <circle cx="12" cy="9" r="2.5" />
+          </svg>
+          <span>Lugar de encuentro</span>
         </button>
+
         <button id="btn-contador" class="champagne-btn" type="button">
-          Temporizador
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" />
+            <polyline points="12 7 12 12 15.5 14" />
+          </svg>
+          <span>Temporizador</span>
+        </button>
+
+        <button id="btn-regalos" class="champagne-btn" type="button">
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="8" width="18" height="4" rx="1" />
+            <rect x="5" y="12" width="14" height="9" rx="1" />
+            <line x1="12" y1="8" x2="12" y2="21" />
+            <path d="M12 8c-1.8 0-4-1-4-2.8a1.8 1.8 0 0 1 3.5-.8C11.9 5.3 12 6.8 12 8z" />
+            <path d="M12 8c1.8 0 4-1 4-2.8a1.8 1.8 0 0 0-3.5-.8C12.1 5.3 12 6.8 12 8z" />
+          </svg>
+          <span>Sugerencias de regalos</span>
         </button>
       </nav>
 
@@ -103,6 +130,19 @@
               <small>Segundos</small>
             </div>
           </div>
+        </div>
+
+        <div id="panel-regalos" class="panel-content hidden">
+          <h2>Sugerencias de regalos</h2>
+          <ul id="gifts-list" class="gifts-list"></ul>
+          <p id="gift-alias-note" class="gift-alias-note"></p>
+          <button id="btn-copy-alias" class="copy-alias-btn" type="button">
+            <svg class="copy-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="9" y="9" width="13" height="13" rx="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
+            <span id="copy-alias-label">Copiar alias</span>
+          </button>
         </div>
       </section>
     </section>
