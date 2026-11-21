@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Victoria — Mis 15 Años</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="invitation-frame">
+    <!-- Video de apertura que queda como fondo en la hoja interior -->
+    <video
+      id="bg-video"
+      class="bg-video"
+      playsinline
+      autoplay
+      muted
+      preload="auto"
+    >
+      <source src="video_1.mp4" type="video/mp4" />
+      Tu navegador no soporta la reproducción de video MP4.
+    </video>
+
+    <!-- Botón opcional para ir directo a la hoja antes de que termine el video -->
+    <button id="btn-skip" class="btn-skip" type="button">
+      Ver invitación →
+    </button>
+
+    <!-- Contenido interactivo posicionado directamente sobre la hoja interior -->
+    <section id="sheet-overlay" class="sheet-overlay" aria-label="Contenido de la invitación">
+      <header class="sheet-header">
+        <p class="eyebrow">MIS XV AÑOS</p>
+        <h1 id="quinceanera-name">Victoria</h1>
+        <div class="gold-divider"><span>✦</span></div>
+        <p id="invitation-phrase" class="phrase">
+          Cargando frase especial...
+        </p>
+      </header>
+
+      <nav class="action-buttons" aria-label="Opciones de la invitación">
+        <button id="btn-fecha" class="champagne-btn" type="button">
+          Fecha del evento
+        </button>
+        <button id="btn-lugar" class="champagne-btn" type="button">
+          Lugar de encuentro
+        </button>
+        <button id="btn-contador" class="champagne-btn" type="button">
+          Temporizador
+        </button>
+      </nav>
+
+      <!-- Panel interactivo sobre la misma hoja -->
+      <section id="info-panel" class="info-panel hidden" aria-live="polite">
+        <div id="panel-fecha" class="panel-content hidden">
+          <h2>Fecha del Evento</h2>
+          <p id="event-date-text" class="panel-highlight"></p>
+          <p id="event-time-text" class="panel-sub"></p>
+          <a
+            id="calendar-link"
+            class="secondary-link"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Agendar en Google Calendar
+          </a>
+        </div>
+
+        <div id="panel-lugar" class="panel-content hidden">
+          <h2>Lugar de Encuentro</h2>
+          <p id="event-address-text" class="panel-highlight"></p>
+          <a
+            id="maps-link"
+            class="secondary-link"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Abrir en Google Maps
+          </a>
+        </div>
+
+        <div id="panel-contador" class="panel-content hidden">
+          <h2>Falta para el evento</h2>
+          <div class="countdown-grid">
+            <div class="time-box">
+              <span id="days">00</span>
+              <small>Días</small>
+            </div>
+            <div class="time-box">
+              <span id="hours">00</span>
+              <small>Horas</small>
+            </div>
+            <div class="time-box">
+              <span id="minutes">00</span>
+              <small>Minutos</small>
+            </div>
+            <div class="time-box">
+              <span id="seconds">00</span>
+              <small>Segundos</small>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
