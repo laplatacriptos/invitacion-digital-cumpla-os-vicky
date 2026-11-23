@@ -27,8 +27,129 @@ let eventConfig = {
 
 let countdownInterval = null;
 let overlayCompleted = false;
+let invitationStarted = false;
 let copyResetTimeout = null;
 let revealRafId = null;
+
+let isAudioPlaying = false;
+let userPausedAudio = false;
+let audioFadeInterval = null;
+const TARGET_AUDIO_VOLUME = 0.65;
+
+function updateAudioButtonUI() {
+  const audioBtn = document.getElementById("btn-audio");
+  if (!audioBtn) return;
+
+  const labelText = isAudioPlaying ? "Pausar música de fondo" : "Activar música de fondo";
+  audioBtn.classList.toggle("playing", isAudioPlaying);
+  audioBtn.classList.toggle("muted", !isAudioPlaying);
+  audioBtn.setAttribute("aria-pressed", String(isAudioPlaying));
+  audioBtn.setAttribute("aria-label", labelText);
+  audioBtn.setAttribute("title", labelText);
+}
+
+function clearAudioFade() {
+  if (audioFadeInterval) {
+    clearInterval(audioFadeInterval);
+    audioFadeInterval = null;
+  }
+}
+
+function fadeInAudio(audioEl, targetVolume = TARGET_AUDIO_VOLUME, durationMs = 900) {
+  clearAudioFade();
+  audioEl.volume = 0;
+  const steps = 18;
+  const stepTime = durationMs / steps;
+  const increment = targetVolume / steps;
+
+  audioFadeInterval = setInterval(() => {
+    const nextVol = Math.min(targetVolume, audioEl.volume + increment);
+    audioEl.volume = nextVol;
+    if (nextVol >= targetVolume) {
+      clearAudioFade();
+    }
+  }, stepTime);
+}
+
+async function playBackgroundMusic({ manual = false } = {}) {
+  const audioEl = document.getElementById("bg-music");
+  if (!audioEl) return false;
+  if (!manual && userPausedAudio) return false;
+
+  if (!audioEl.paused) {
+    isAudioPlaying = true;
+    updateAudioButtonUI();
+    return true;
+  }
+
+  try {
+    userPausedAudio = false;
+    await audioEl.play();
+    isAudioPlaying = true;
+    updateAudioButtonUI();
+    fadeInAudio(audioEl, TARGET_AUDIO_VOLUME, 900);
+    return true;
+  } catch (err) {
+    isAudioPlaying = false;
+    updateAudioButtonUI();
+    return false;
+  }
+}
+
+function pauseBackgroundMusic() {
+  const audioEl = document.getElementById("bg-music");
+  clearAudioFade();
+  userPausedAudio = true;
+  if (audioEl) {
+    audioEl.pause();
+  }
+  isAudioPlaying = false;
+  updateAudioButtonUI();
+}
+
+async function toggleBackgroundMusic() {
+  if (isAudioPlaying) {
+    pauseBackgroundMusic();
+  } else {
+    await playBackgroundMusic({ manual: true });
+  }
+}
+
+async function openDigitalInvitation() {
+  if (invitationStarted) return;
+  invitationStarted = true;
+
+  const openBtn = document.getElementById("btn-open-invitation");
+  const skipBtn = document.getElementById("btn-skip");
+  const video = document.getElementById("bg-video");
+
+  if (openBtn) {
+    openBtn.classList.add("is-hiding");
+    setTimeout(() => {
+      openBtn.classList.add("hidden");
+    }, 450);
+  }
+
+  if (skipBtn && !overlayCompleted) {
+    skipBtn.classList.remove("hidden");
+  }
+
+  if (video) {
+    video.currentTime = 0;
+    try {
+      await video.play();
+    } catch (err) {
+      // Si el navegador impide el play por alguna razón, permitimos saltar directo
+      revealSheetControls();
+    }
+    if (!overlayCompleted) {
+      if (revealRafId) cancelAnimationFrame(revealRafId);
+      revealRafId = requestAnimationFrame(syncRevealWithVideo);
+    }
+  }
+
+  await playBackgroundMusic({ manual: true });
+}
 
 async function loadConfig() {
   try {
@@ -153,7 +274,7 @@ function setRevealProgress(progress) {
 
 function syncRevealWithVideo() {
   const video = document.getElementById("bg-video");
-  if (!video || overlayCompleted) return;
+  if (!video || overlayCompleted || !invitationStarted) return;
 
   if (video.duration && Number.isFinite(video.duration)) {
     const openStart = video.duration * 0.42;
@@ -173,6 +294,7 @@ function revealSheetControls() {
 
   const video = document.getElementById("bg-video");
   const skipBtn = document.getElementById("btn-skip");
+  const openBtn = document.getElementById("btn-open-invitation");
   const overlay = document.getElementById("sheet-overlay");
 
   setRevealProgress(1);
@@ -182,6 +304,9 @@ function revealSheetControls() {
     video.currentTime = Math.max(0, video.duration - 0.05);
   }
 
+  if (openBtn) {
+    openBtn.classList.add("hidden");
+  }
   if (skipBtn) {
     skipBtn.classList.add("hidden");
   }
@@ -235,48 +360,77 @@ function startCountdown() {
 document.addEventListener("DOMContentLoaded", () => {
   loadConfig();
   setRevealProgress(0);
+  updateAudioButtonUI();
 
   const video = document.getElementById("bg-video");
+  const openBtn = document.getElementById("btn-open-invitation");
   const skipBtn = document.getElementById("btn-skip");
   const copyAliasBtn = document.getElementById("btn-copy-alias");
+  const audioBtn = document.getElementById("btn-audio");
+  const audioEl = document.getElementById("bg-music");
 
   if (video) {
-    video.addEventListener("play", () => {
-      if (!overlayCompleted) {
-        if (revealRafId) cancelAnimationFrame(revealRafId);
-        revealRafId = requestAnimationFrame(syncRevealWithVideo);
+    video.pause();
+    video.currentTime = 0;
+    video.addEventListener("loadedmetadata", () => {
+      if (!invitationStarted) {
+        video.pause();
+        video.currentTime = 0;
       }
     });
     video.addEventListener("ended", revealSheetControls);
     video.addEventListener("timeupdate", () => {
-      if (video.duration && video.currentTime >= video.duration - 0.15) {
+      if (invitationStarted && video.duration && video.currentTime >= video.duration - 0.15) {
         revealSheetControls();
       }
     });
-    revealRafId = requestAnimationFrame(syncRevealWithVideo);
+  }
+
+  if (openBtn) {
+    openBtn.addEventListener("click", openDigitalInvitation);
+  }
+
+  if (audioEl) {
+    audioEl.addEventListener("play", () => {
+      isAudioPlaying = true;
+      updateAudioButtonUI();
+    });
+    audioEl.addEventListener("pause", () => {
+      if (!audioEl.ended) {
+        isAudioPlaying = false;
+        updateAudioButtonUI();
+      }
+    });
+  }
+
+  if (audioBtn) {
+    audioBtn.addEventListener("click", toggleBackgroundMusic);
   }
 
   if (skipBtn) {
-    skipBtn.addEventListener("click", revealSheetControls);
+    skipBtn.addEventListener("click", () => {
+      revealSheetControls();
+      playBackgroundMusic();
+    });
   }
 
   if (copyAliasBtn) {
     copyAliasBtn.addEventListener("click", copyAliasToClipboard);
   }
 
-  document.getElementById("btn-fecha").addEventListener("click", function () {
-    showPanel("panel-fecha", this);
-  });
-
-  document.getElementById("btn-lugar").addEventListener("click", function () {
-    showPanel("panel-lugar", this);
-  });
-
-  document.getElementById("btn-contador").addEventListener("click", function () {
-    showPanel("panel-contador", this);
-  });
-
-  document.getElementById("btn-regalos").addEventListener("click", function () {
-    showPanel("panel-regalos", this);
+  ["btn-fecha", "btn-lugar", "btn-contador", "btn-regalos"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener("click", function () {
+        const panelMap = {
+          "btn-fecha": "panel-fecha",
+          "btn-lugar": "panel-lugar",
+          "btn-contador": "panel-contador",
+          "btn-regalos": "panel-regalos"
+        };
+        showPanel(panelMap[id], this);
+        playBackgroundMusic();
+      });
+    }
   });
 });

@@ -11,21 +11,51 @@
 </head>
 <body>
   <main class="invitation-frame">
-    <!-- Video de apertura que queda como fondo en la hoja interior -->
+    <!-- Video de apertura pausado en el sello "V" hasta que el usuario toque el botón -->
     <video
       id="bg-video"
       class="bg-video"
       playsinline
-      autoplay
-      muted="false"
+      muted
       preload="auto"
     >
       <source src="video_1.mp4" type="video/mp4" />
       Tu navegador no soporta la reproducción de video MP4.
     </video>
 
+    <!-- Música de fondo -->
+    <audio id="bg-music" preload="auto" loop>
+      <source src="musica.mp3" type="audio/mpeg" />
+    </audio>
+
+    <!-- Botón para abrir la invitación sobre el sello "V" -->
+    <button
+      id="btn-open-invitation"
+      class="btn-open-seal"
+      type="button"
+    >
+      Abrir la invitación digital
+    </button>
+
+    <!-- Botón de audio con ícono y línea tachada cuando está apagado -->
+    <button
+      id="btn-audio"
+      class="btn-audio muted"
+      type="button"
+      aria-label="Activar música de fondo"
+      title="Activar música de fondo"
+      aria-pressed="false"
+    >
+      <svg class="audio-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M11 5L6 9H2v6h4l5 4V5z" />
+        <path class="sound-wave" d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+        <path class="sound-wave" d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+        <line class="mute-slash" x1="3" y1="3" x2="21" y2="21" />
+      </svg>
+    </button>
+
     <!-- Botón opcional para ir directo a la hoja antes de que termine el video -->
-    <button id="btn-skip" class="btn-skip" type="button">
+    <button id="btn-skip" class="btn-skip hidden" type="button">
       Ver invitación →
     </button>
 
@@ -162,5 +192,19 @@
   </main>
 
   <script src="script.js"></script>
+
+
+  <script>
+  document.addEventListener(
+  "pointerdown",
+  () => {
+    if (!isAudioPlaying && !userPausedAudio) {
+      playBackgroundMusic();
+    }
+  },
+  { once: true }
+);
+</script>
 </body>
+
 </html>
